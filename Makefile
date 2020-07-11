@@ -3,3 +3,7 @@ build:
 
 run:
 	./bin/telescope
+
+compose:
+	docker-compose build
+	docker-compose up
