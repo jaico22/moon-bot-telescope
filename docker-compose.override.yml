@@ -34,19 +34,22 @@ services:
         container_name: dynamodb-local
         ports:
             - "8000:8000"   
+        depends_on: 
+            - ecs-local-endpoints
         networks:
             credentials_network:
                 # This special IP address is recognized by the AWS SDKs and AWS CLI 
-                ipv4_address: "169.254.170.3"        
+                ipv4_address: "169.254.170.4"                    
     # Here we reference the application container that we are testing
     # You can test multiple containers at a time, simply duplicate this section
     # and customize it for each container, and give it a unique IP in 'credentials_network'.
     app:
         depends_on:
-            - dynamodb-local
             - ecs-local-endpoints
+            - dynamodb-local
         networks:
             credentials_network:
-                ipv4_address: "169.254.170.4"
+                ipv4_address: "169.254.170.3"
         environment:
           AWS_DEFAULT_REGION: "us-east-1"
+          AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: "/creds"

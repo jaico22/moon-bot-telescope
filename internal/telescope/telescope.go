@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/jaico22/moonbot-telescope/internal/database"
 	"github.com/jaico22/moonbot-telescope/pkg/kraken"
 )
 
@@ -18,6 +19,7 @@ var configuration Config
 // Setup initializes all dependencies
 func Setup(config Config) {
 	configuration = config
+	database.Initialize()
 }
 
 // Run starts the sniffing processes

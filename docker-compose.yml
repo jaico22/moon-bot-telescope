@@ -9,3 +9,5 @@ services:
       PORT: "80"
     tty: true
     command: make run
+    volumes:
+      - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
