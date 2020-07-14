@@ -60,7 +60,6 @@ func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set AskingPrice = :p"),
 	}
-	svc.UpdateItem(input)
 	_, err := svc.UpdateItem(input)
 	if err != nil {
 		log.Println(err.Error())

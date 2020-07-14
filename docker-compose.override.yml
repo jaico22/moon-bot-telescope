@@ -39,7 +39,18 @@ services:
         networks:
             credentials_network:
                 # This special IP address is recognized by the AWS SDKs and AWS CLI 
-                ipv4_address: "169.254.170.4"                    
+                ipv4_address: "169.254.170.4"      
+    dynamo-admin:
+        image: instructure/dynamo-local-admin
+        ports:
+            - "8001:8001"
+            - "8042:8042"
+        environment:
+            DYNAMO_ENDPOINT: http://169.254.170.4:8000      
+        networks:
+            credentials_network:
+                # This special IP address is recognized by the AWS SDKs and AWS CLI 
+                ipv4_address: "169.254.170.5"            
     # Here we reference the application container that we are testing
     # You can test multiple containers at a time, simply duplicate this section
     # and customize it for each container, and give it a unique IP in 'credentials_network'.
