@@ -9,7 +9,7 @@ import (
 )
 
 // Initialize initializes the dynamo client
-func Initialize() {
+func Initialize() *dynamodb.DynamoDB {
 	// Initialize a session that the SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials
 	// and region from the shared configuration file ~/.aws/config.
@@ -22,4 +22,5 @@ func Initialize() {
 	log.Println("Create DynamoDB Client...")
 	svc := dynamodb.New(sess, &aws.Config{Endpoint: aws.String("http://169.254.170.4:8000")})
 	CreatePricesTable(svc)
+	return svc
 }
