@@ -1,0 +1,15 @@
+ersion: 0.2
+
+env:
+  variables:
+    S3_BUCKET: "moonbot-deployments"
+
+phases:
+  build:
+    commands:
+      - make build
+      - aws cloudformation package --template-file template.yml --s3-bucket ${S3_BUCKET} --output-template-file packaged.yml
+
+artifacts:
+  files:
+    - packaged.yml

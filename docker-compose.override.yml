@@ -45,12 +45,28 @@ services:
         ports:
             - "8001:8001"
             - "8042:8042"
+        depends_on: 
+            - ecs-local-endpoints
+            - dynamodb-local
         environment:
             DYNAMO_ENDPOINT: http://169.254.170.4:8000      
         networks:
             credentials_network:
                 # This special IP address is recognized by the AWS SDKs and AWS CLI 
                 ipv4_address: "169.254.170.5"            
+    lambda:
+        container_name: lambda
+        image: lambci/lambda:go1.x
+        #command: app.MyFunctionName
+        ports: 
+            - "9001:9001"
+        volumes:
+            - ./bin:/var/task:ro,delegated
+        environment: 
+            DOCKER_LAMBDA_STAY_OPEN: 1
+        networks: 
+            credentials_network:
+                ipv4_address: "169.254.170.6"
     # Here we reference the application container that we are testing
     # You can test multiple containers at a time, simply duplicate this section
     # and customize it for each container, and give it a unique IP in 'credentials_network'.
@@ -58,9 +74,12 @@ services:
         depends_on:
             - ecs-local-endpoints
             - dynamodb-local
+            - lambda
         networks:
             credentials_network:
                 ipv4_address: "169.254.170.3"
         environment:
           AWS_DEFAULT_REGION: "us-east-1"
           AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: "/creds"
+          AWS_LAMBDA_SERVER_PORT: "5000"
+          AWS_LAMBDA_RUNTIME_API: "169.254.170.6:9001"

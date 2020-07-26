@@ -1,15 +1,25 @@
 package main
 
 import (
-	"time"
+	"context"
+	"fmt"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/jaico22/moonbot-telescope/internal/telescope"
 )
 
 func main() {
-	telescopeConfig := telescope.Config{
-		SampleTime: time.Second * 5,
-	}
-	telescope.Setup(telescopeConfig)
-	telescope.Run()
+	telescope.Setup()
+	lambda.Start(HandleRequest)
+}
+
+// RecordEvent is a placeholder for the lambda request
+type RecordEvent struct {
+}
+
+// HandleRequest is the default lambda endpoint handling
+// TODO: Make a more meaningful responce
+func HandleRequest(ctx context.Context, recordEvent RecordEvent) (string, error) {
+	telescope.Trigger()
+	return fmt.Sprintf("Recorded", nil), nil
 }
