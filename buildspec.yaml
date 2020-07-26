@@ -8,9 +8,8 @@ phases:
   build:
     commands:
       - make build
-      - aws cloudformation package --template-file template.yml --s3-bucket ${S3_BUCKET} --output-template-file appspec.yaml
+      - aws cloudformation package --template-file template.yml --s3-bucket ${S3_BUCKET} --output-template-file packaged.yaml
 
 artifacts:
   files:
-    - bin/telecope
-    - appspec.yaml
+    - packaged.yaml
