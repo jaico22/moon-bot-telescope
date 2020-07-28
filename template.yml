@@ -13,3 +13,7 @@ Resources:
           Properties:
             Path: /
             Method: post
+        AutoPopulateEvent:
+            Type: Schedule
+            Properties:
+              Schedule: rate(10 seconds)
