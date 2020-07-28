@@ -3,7 +3,6 @@ package database
 import (
 	"log"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
@@ -20,7 +19,7 @@ func Initialize() *dynamodb.DynamoDB {
 
 	// Create DynamoDB client
 	log.Println("Create DynamoDB Client...")
-	svc := dynamodb.New(sess, &aws.Config{Endpoint: aws.String("http://169.254.170.4:8000")})
+	svc := dynamodb.New(sess)
 	CreatePricesTable(svc)
 	return svc
 }

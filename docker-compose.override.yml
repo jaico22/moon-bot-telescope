@@ -29,9 +29,8 @@ services:
             credentials_network:
                 # This special IP address is recognized by the AWS SDKs and AWS CLI 
                 ipv4_address: "169.254.170.2"
-    dynamodb-local:
+    dynamodb:
         image: amazon/dynamodb-local
-        container_name: dynamodb-local
         ports:
             - "8000:8000"   
         depends_on: 
@@ -47,7 +46,7 @@ services:
             - "8042:8042"
         depends_on: 
             - ecs-local-endpoints
-            - dynamodb-local
+            - dynamodb
         environment:
             DYNAMO_ENDPOINT: http://169.254.170.4:8000      
         networks:
@@ -61,9 +60,12 @@ services:
         ports: 
             - "9001:9001"
         volumes:
-            - ./bin:/var/task:ro,delegated
+            - ./:/var/task:ro,delegated
         environment: 
             DOCKER_LAMBDA_STAY_OPEN: 1
+        depends_on: 
+            - ecs-local-endpoints
+            - dynamodb
         networks: 
             credentials_network:
                 ipv4_address: "169.254.170.6"
@@ -73,7 +75,7 @@ services:
     app:
         depends_on:
             - ecs-local-endpoints
-            - dynamodb-local
+            - dynamodb
             - lambda
         networks:
             credentials_network:
