@@ -1,8 +1,8 @@
 build:
-	go build -o bin/telescope cmd/telescope/telescope.go
+	go build -o main cmd/telescope/telescope.go
 
 run:
-	./bin/telescope
+	./main
 
 compose:
 	docker-compose build
