@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-	telescope.Setup()
 	lambda.Start(HandleRequest)
 }
 
@@ -20,6 +19,7 @@ type RecordEvent struct {
 // HandleRequest is the default lambda endpoint handling
 // TODO: Make a more meaningful responce
 func HandleRequest(ctx context.Context, recordEvent RecordEvent) (string, error) {
+	telescope.Setup()
 	telescope.Trigger()
 	return fmt.Sprintf("Recorded", nil), nil
 }

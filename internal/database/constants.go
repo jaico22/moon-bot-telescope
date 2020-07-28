@@ -1,3 +1,3 @@
 package database
 
-const resourceInUseException = "ResourceInUseException: Cannot create preexisting table"
+const resourceInUseException = "ResourceInUseException: Table already exists: PriceHistory"
