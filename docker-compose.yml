@@ -1,13 +1,69 @@
+# version: "2"
+# services:
+#   app:
+#     build:
+#       context: .
+#     ports:
+#       - 8080:80
+#     environment:
+#       PORT: "80"
+#     tty: true
+#     command: make run
+#     volumes:
+#       - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
 version: "2"
+networks:
+    local:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: "169.254.170.0/24"
+                  gateway: 169.254.170.1
 services:
-  app:
-    build:
-      context: .
-    ports:
-      - 8080:80
-    environment:
-      PORT: "80"
-    tty: true
-    command: make run
-    volumes:
-      - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
+    # This container vends credentials to your containers
+    ecs-local-endpoints:
+        # The Amazon ECS Local Container Endpoints Docker Image
+        image: amazon/amazon-ecs-local-container-endpoints
+        volumes:
+          # Mount /var/run so we can access docker.sock and talk to Docker
+          - /var/run:/var/run
+          # Mount the shared configuration directory, used by the AWS CLI and AWS SDKs
+          # On Windows, this directory can be found at "%UserProfile%\.aws"
+          - $HOME/.aws/:/home/.aws/
+        environment:
+          # define the home folder; credentials will be read from $HOME/.aws
+          HOME: "/home"
+          # You can change which AWS CLI Profile is used
+          AWS_PROFILE: "default"
+        networks:
+            local:
+                # This special IP address is recognized by the AWS SDKs and AWS CLI 
+                ipv4_address: "169.254.170.2"
+    dynamodb:
+        image: amazon/dynamodb-local
+        ports:
+            - "8000:8000"   
+        depends_on: 
+            - ecs-local-endpoints
+        environment: 
+            - AWS_ACCESS_KEY_ID=dummy
+            - AWS_SECRET_ACCESS_KEY=dummy
+            - AWS_REGION=localhost
+        networks:
+            local:
+                # This special IP address is recognized by the AWS SDKs and AWS CLI 
+                ipv4_address: "169.254.170.4"      
+    dynamo-admin:
+        image: instructure/dynamo-local-admin
+        ports:
+            - "8001:8001"
+            - "8042:8042"
+        depends_on: 
+            - ecs-local-endpoints
+            - dynamodb
+        environment:
+            DYNAMO_ENDPOINT: http://169.254.170.4:8000      
+        networks:
+            local:
+                # This special IP address is recognized by the AWS SDKs and AWS CLI 
+                ipv4_address: "169.254.170.5"          
