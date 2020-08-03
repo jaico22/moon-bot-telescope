@@ -44,6 +44,7 @@ func CreatePricesTable(svc *dynamodb.DynamoDB) {
 
 // RecordPrice takes a price and records it into dynamo
 func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
+	log.Println("Adding record to database...")
 	askingPrice := fmt.Sprintf("%1.8f", priceRecord.AskingPrice)
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{

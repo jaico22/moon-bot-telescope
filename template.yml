@@ -17,3 +17,7 @@ Resources:
             Type: Schedule
             Properties:
               Schedule: rate(1 minute)
+      Timeout: 300
+      Environment:
+        Variables:
+          ENVIRONMENT: "LOCAL"
