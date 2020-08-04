@@ -1,3 +1,6 @@
+install:
+	go install cmd/telescope/telescope.go
+
 build:
 	GOARCH=amd64 GOOS=linux go build -o main cmd/telescope/telescope.go
 

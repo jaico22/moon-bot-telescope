@@ -11,7 +11,7 @@ import (
 func createTable(tableName string, svc *dynamodb.DynamoDB, tableInput *dynamodb.CreateTableInput) {
 	_, err := svc.CreateTable(tableInput)
 	if err != nil {
-		if err.Error() != resourceInUseException {
+		if err.Error() != resourceInUseException && err.Error() != getTableExistsExceptionString(tableName) {
 			log.Println("An unexpected error occured creating the table:")
 			log.Println(err.Error())
 			os.Exit(1)

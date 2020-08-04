@@ -1,7 +1,6 @@
 package telescope
 
 import (
-	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -18,15 +17,15 @@ func Setup() {
 
 // Trigger gets the current asking price and records into the database
 func Trigger() {
-	currentAskingPrice := kraken.GetDogePrice()
-	log.Printf("Current Asking Price: %1.8f\n", currentAskingPrice)
-	recordCurrentAskingPrice(currentAskingPrice)
+	currentDogePriceData := kraken.GetDogePrice()
+	recordPriceData(currentDogePriceData)
 }
 
-func recordCurrentAskingPrice(askingPrice float32) {
+func recordPriceData(currentDogePriceData kraken.DogePriceData) {
 	priceRecord := database.PriceRecord{
-		DateTime:    time.Now(),
-		AskingPrice: askingPrice,
+		DateTime:     time.Now(),
+		AskingPrice:  currentDogePriceData.AskingPrice,
+		BiddingPrice: currentDogePriceData.BiddingPrice,
 	}
 	database.RecordPrice(svc, priceRecord)
 }
