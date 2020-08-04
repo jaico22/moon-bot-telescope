@@ -4,7 +4,7 @@ _Telescope_ is a utility that actively observes and records the current price of
 ## Installation and Setup
 Everything you need to run telescope locally should be accessable in the Make file. 
 
-`make build` builds the binary
+`make build` builds the binaries
 
 `make setup` setups an alias for localhost and then runs docker-compose up to setup all dependent services
 
