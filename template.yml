@@ -11,7 +11,7 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /scrape
             Method: post
         AutoPopulateEvent:
             Type: Schedule
@@ -26,5 +26,5 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /view
             Method: post
