@@ -21,6 +21,11 @@ func Trigger() {
 	recordPriceData(currentDogePriceData)
 }
 
+// GetData parses the request agianst the database and returns matching records
+func GetData(request DataRequest) []database.PriceRecord {
+	return database.GetPricesByDateRange(svc, request.StartDate, request.EndDate, request.Version)
+}
+
 func recordPriceData(currentDogePriceData kraken.DogePriceData) {
 	priceRecord := database.PriceRecord{
 		DateTime:     time.Now(),

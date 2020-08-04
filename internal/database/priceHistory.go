@@ -3,10 +3,13 @@ package database
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 )
 
 // PriceRecord is a container containg data relating to a price recording
@@ -57,15 +60,18 @@ func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 			":bp": {
 				N: aws.String((biddingPrice)),
 			},
+			":v": {
+				N: aws.String("2"),
+			},
 		},
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"DateTime": {
-				S: aws.String(priceRecord.DateTime.String()),
+				S: aws.String(priceRecord.DateTime.Format("2006-01-02T15:04:05Z07:00")),
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("SET AskingPrice = :ap, BiddingPrice = :bp"),
+		UpdateExpression: aws.String("SET AskingPrice = :ap, BiddingPrice = :bp, Version = :v"),
 	}
 	_, err := svc.UpdateItem(input)
 	if err != nil {
@@ -74,4 +80,46 @@ func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 	} else {
 		log.Println("Price Data Recorded Successfully")
 	}
+}
+
+// GetPricesByDateRange returns PriceRecords between startDate and endDate
+func GetPricesByDateRange(svc *dynamodb.DynamoDB, startDate time.Time, endDate time.Time, version int) []PriceRecord {
+	// Build expression and scan object
+	log.Println("Version: ", version)
+	versionFilter := expression.Name("Version").AttributeExists().And(expression.Name("Version").Equal(expression.Value(version)))
+	//dateTimeFilter := expression.Name("DateTime").Between(expression.Value(startDate), expression.Value(endDate))
+	filter := versionFilter //.And(dateTimeFilter)
+	projection := expression.NamesList(
+		expression.Name("DateTime"),
+		expression.Name("AskingPrice"),
+		expression.Name("BiddingPrice"))
+	expr, err := expression.NewBuilder().WithFilter(filter).WithProjection(projection).Build()
+	if err != nil {
+		log.Println("An error occured building the expression: ", err.Error())
+		os.Exit(1)
+	}
+	params := &dynamodb.ScanInput{
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+		FilterExpression:          expr.Filter(),
+		ProjectionExpression:      expr.Projection(),
+		TableName:                 aws.String(tableName),
+	}
+	result, err := svc.Scan(params)
+	if err != nil {
+		log.Println("An error occured executing the query: ", err.Error())
+		os.Exit(1)
+	}
+	// Unmarshal and return
+	var priceRecords []PriceRecord
+	for _, item := range result.Items {
+		priceRecord := PriceRecord{}
+		err = dynamodbattribute.UnmarshalMap(item, &priceRecord)
+		if err != nil {
+			log.Println("An error occured during unmarshalling:", err.Error())
+			os.Exit(1)
+		}
+		priceRecords = append(priceRecords, priceRecord)
+	}
+	return priceRecords
 }
