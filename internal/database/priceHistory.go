@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
+	"github.com/kjk/betterguid"
 )
 
 // PriceRecord is a container containg data relating to a price recording
@@ -19,7 +20,7 @@ type PriceRecord struct {
 	BiddingPrice float32   `json:"BiddingPrice"`
 }
 
-const tableName = "PriceHistory"
+const tableName = "MoonBot-PriceData"
 
 // CreatePricesTable initialized the users table
 func CreatePricesTable(svc *dynamodb.DynamoDB) {
@@ -27,14 +28,22 @@ func CreatePricesTable(svc *dynamodb.DynamoDB) {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
+				AttributeName: aws.String("ItemId"),
+				AttributeType: aws.String("S"),
+			},
+			{
 				AttributeName: aws.String("DateTime"),
 				AttributeType: aws.String("S"),
 			},
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
-				AttributeName: aws.String("DateTime"),
+				AttributeName: aws.String("ItemId"),
 				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("DateTime"),
+				KeyType:       aws.String("RANGE"),
 			},
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
@@ -58,7 +67,7 @@ func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 				N: aws.String(askingPrice),
 			},
 			":bp": {
-				N: aws.String((biddingPrice)),
+				N: aws.String(biddingPrice),
 			},
 			":v": {
 				N: aws.String("2"),
@@ -66,6 +75,9 @@ func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 		},
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
+			"ItemId": {
+				S: aws.String(betterguid.New()),
+			},
 			"DateTime": {
 				S: aws.String(priceRecord.DateTime.Format("2006-01-02T15:04:05Z07:00")),
 			},
