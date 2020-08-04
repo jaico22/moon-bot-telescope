@@ -11,8 +11,9 @@ import (
 
 // PriceRecord is a container containg data relating to a price recording
 type PriceRecord struct {
-	DateTime    time.Time `json:"DateTime"`
-	AskingPrice float32   `json:"AskingPrice"`
+	DateTime     time.Time `json:"DateTime"`
+	AskingPrice  float32   `json:"AskingPrice"`
+	BiddingPrice float32   `json:"BiddingPrice"`
 }
 
 const tableName = "PriceHistory"
@@ -46,10 +47,15 @@ func CreatePricesTable(svc *dynamodb.DynamoDB) {
 func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 	log.Println("Adding record to database...")
 	askingPrice := fmt.Sprintf("%1.8f", priceRecord.AskingPrice)
+	biddingPrice := fmt.Sprintf("%1.8f", priceRecord.BiddingPrice)
+	log.Printf("BiddingPrice: %s AskingPrice: %s\n", biddingPrice, askingPrice)
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":p": {
+			":ap": {
 				N: aws.String(askingPrice),
+			},
+			":bp": {
+				N: aws.String((biddingPrice)),
 			},
 		},
 		TableName: aws.String(tableName),
@@ -59,12 +65,13 @@ func RecordPrice(svc *dynamodb.DynamoDB, priceRecord PriceRecord) {
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set AskingPrice = :p"),
+		UpdateExpression: aws.String("SET AskingPrice = :ap, BiddingPrice = :bp"),
 	}
 	_, err := svc.UpdateItem(input)
 	if err != nil {
 		log.Println(err.Error())
 		return
+	} else {
+		log.Println("Price Data Recorded Successfully")
 	}
-	log.Println("Price recorded")
 }
