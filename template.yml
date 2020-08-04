@@ -5,7 +5,7 @@ Resources:
   ScrapeData:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: main
+      Handler: bin/telescope
       Runtime: go1.x
       Events:
         GetEvent:
@@ -17,3 +17,14 @@ Resources:
             Type: Schedule
             Properties:
               Schedule: rate(1 minute)
+  ViewData:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: bin/lens
+      Runtime: go1.x
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post

@@ -1,12 +1,14 @@
 install:
 	npm install -g dynamodb-admin
 	go install cmd/telescope/telescope.go
+	go install cmd/lens/lens.go
 
 build:
-	GOARCH=amd64 GOOS=linux go build -o main cmd/telescope/telescope.go
+	GOARCH=amd64 GOOS=linux go build -o bin/telescope cmd/telescope/telescope.go
+	GOARCH=amd64 GOOS=linux go build -o bin/lens cmd/lens/lens.go
 
 run:
-	sam local invoke --docker-network telescope_local -t ./template.yml ScrapeData
+	sam local start-lambda --docker-network telescope_local -t ./template.yml 
 
 setup:
 	# Set ip alias for local host, this is required because
