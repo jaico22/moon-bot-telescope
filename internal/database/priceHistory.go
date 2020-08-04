@@ -87,8 +87,8 @@ func GetPricesByDateRange(svc *dynamodb.DynamoDB, startDate time.Time, endDate t
 	// Build expression and scan object
 	log.Println("Version: ", version)
 	versionFilter := expression.Name("Version").AttributeExists().And(expression.Name("Version").Equal(expression.Value(version)))
-	//dateTimeFilter := expression.Name("DateTime").Between(expression.Value(startDate), expression.Value(endDate))
-	filter := versionFilter //.And(dateTimeFilter)
+	dateTimeFilter := expression.Name("DateTime").Between(expression.Value(startDate), expression.Value(endDate))
+	filter := versionFilter.And(dateTimeFilter)
 	projection := expression.NamesList(
 		expression.Name("DateTime"),
 		expression.Name("AskingPrice"),
