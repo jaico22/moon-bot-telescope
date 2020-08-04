@@ -1,16 +1,3 @@
-# version: "2"
-# services:
-#   app:
-#     build:
-#       context: .
-#     ports:
-#       - 8080:80
-#     environment:
-#       PORT: "80"
-#     tty: true
-#     command: make run
-#     volumes:
-#       - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
 version: "2"
 networks:
     local:
